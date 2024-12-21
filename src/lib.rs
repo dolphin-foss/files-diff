@@ -1,0 +1,222 @@
+// TODO: set timeouts for patch (in DiffMachine), do pass reader from file for
+// zips. do fuzz tests and proptest regressions.
+// test for changing compress and diff algos
+
+//! A library for generating and applying binary diffs between files and
+//! archives.
+//!
+//! This library provides efficient diffing algorithms to generate patches
+//! between binary files or zip archives. It supports multiple diffing
+//! algorithms (rsync and bidiff) and compression methods to optimize patch
+//! sizes.
+//!
+//! # Basic Usage
+//! ```rust
+//! use darkwing_diff::{diff, apply, DEFAULT_ALGO};
+//!
+//! let before = b"hello world";
+//! let after = b"hello darkness my old friend";
+//!
+//! // Generate a patch using default algorithms
+//! let (diff_algo, compress_algo) = DEFAULT_ALGO;
+//! let patch = diff(before, after, diff_algo, compress_algo)?;
+//!
+//! // Apply the patch to recreate the target file
+//! let result = apply(before, &patch)?;
+//! assert_eq!(&result, after);
+//! # Ok::<(), darkwing_diff::Error>(())
+//! ```
+//!
+//! # Advanced Usage
+//! ```no_run
+//! use darkwing_diff::{diff_zip, apply_zip, DiffAlgorithm, CompressAlgorithm};
+//!
+//! // For zip archives, use the specialized zip functions
+//! let patch_set = diff_zip(
+//!     "before.zip".to_string(),
+//!     "after.zip".to_string(),
+//!     DiffAlgorithm::Bidiff1,
+//!     CompressAlgorithm::Zstd
+//! )?;
+//!
+//! // Apply patches to transform the original zip
+//! apply_zip("before.zip", patch_set, "result.zip".to_string())?;
+//! # Ok::<(), darkwing_diff::Error>(())
+//! ```
+//!
+//! The library uses [fast-rsync] for the rsync algorithm and [bidiff] for the
+//! bidiff algorithm. Each patch includes hash validation to ensure data
+//! integrity during the patching process.
+//!
+//! [fast-rsync]: https://github.com/dropbox/fast-rsync
+//! [bidiff]: https://github.com/divvun/bidiff
+
+#![forbid(clippy::unwrap_used)]
+#![forbid(clippy::expect_used)]
+#![warn(missing_docs)]
+
+mod bd;
+mod compress;
+mod error;
+mod patch;
+mod rsync;
+mod zip;
+
+use bd::BidiffDiffMachine;
+pub use compress::CompressAlgorithm;
+pub use error::Error;
+pub use patch::{DiffAlgorithm, Patch, PatchSet};
+use rsync::RsyncDiffMachine;
+pub use zip::{apply_zip, diff_zip};
+
+/// The default diff and compression algorithm.
+pub const DEFAULT_ALGO: (DiffAlgorithm, CompressAlgorithm) =
+  (DiffAlgorithm::Rsync020, CompressAlgorithm::None);
+
+/// A trait that implements diffing and patching operations.
+///
+/// This trait defines the core operations needed to generate and apply patches
+/// between binary data. Implementations provide specific diffing algorithms.
+///
+/// # Example
+/// ```no_run
+/// use darkwing_diff::{DiffMachine, CompressAlgorithm, Error, Patch};
+/// struct MyDiffMachine;
+///
+/// impl DiffMachine for MyDiffMachine {
+///     fn diff(before: &[u8], after: &[u8], compress: CompressAlgorithm) -> Result<Patch, Error> {
+///         // Implementation details...
+///         # todo!()
+///     }
+///     
+///     fn apply(base: &[u8], patch: &Patch) -> Result<Vec<u8>, Error> {
+///         // Implementation details...
+///         # todo!()
+///     }
+/// }
+/// ```
+pub trait DiffMachine {
+  /// Diff two byte slices using the given compression algorithm.
+  fn diff(
+    before: &[u8],
+    after: &[u8],
+    compress_algorithm: CompressAlgorithm,
+  ) -> Result<Patch, Error>;
+
+  /// Apply a patch to a byte slice.
+  fn apply(base: &[u8], delta: &Patch) -> Result<Vec<u8>, Error>;
+}
+
+/// Generates an MD5 hash of the provided data as a hexadecimal string.
+///
+/// This function is used internally for patch validation to ensure data
+/// integrity.
+///
+/// # Example
+/// ```rust
+/// use darkwing_diff::hash;
+///
+/// let data = b"Hello, world!";
+/// let hash_str = hash(data);
+/// assert_eq!(hash_str.len(), 32); // MD5 hash is always 32 hex chars
+/// ```
+pub fn hash(data: &[u8]) -> String {
+  let hash = md5::compute(data);
+  hex::encode(hash.0)
+}
+
+/// Generates a patch between two byte slices using specified algorithms.
+///
+/// Creates a patch that can transform the `before` data into the `after` data,
+/// using the specified diffing and compression algorithms.
+///
+/// # Example
+/// ```rust
+/// use darkwing_diff::{diff, DiffAlgorithm, CompressAlgorithm};
+///
+/// let before = b"original data";
+/// let after = b"modified data";
+///
+/// let patch = diff(
+///     before,
+///     after,
+///     DiffAlgorithm::Rsync020,
+///     CompressAlgorithm::Zstd
+/// )?;
+/// # Ok::<(), darkwing_diff::Error>(())
+/// ```
+pub fn diff(
+  before: &[u8],
+  after: &[u8],
+  diff_algorithm: DiffAlgorithm,
+  compress_algorithm: CompressAlgorithm,
+) -> Result<Patch, Error> {
+  match diff_algorithm {
+    DiffAlgorithm::Rsync020 => {
+      RsyncDiffMachine::diff(before, after, compress_algorithm)
+    }
+    DiffAlgorithm::Bidiff1 => {
+      BidiffDiffMachine::diff(before, after, compress_algorithm)
+    }
+  }
+}
+
+/// Applies a patch to transform the base data.
+///
+/// Takes a patch generated by `diff()` and applies it to the base data
+/// to recreate the target data.
+///
+/// # Example
+/// ```rust
+/// use darkwing_diff::{diff, apply, DEFAULT_ALGO};
+///
+/// let base = b"original data";
+/// let target = b"modified data";
+///
+/// let (diff_algo, compress_algo) = DEFAULT_ALGO;
+/// let patch = diff(base, target, diff_algo, compress_algo)?;
+/// let result = apply(base, &patch)?;
+///
+/// assert_eq!(result, target);
+/// # Ok::<(), darkwing_diff::Error>(())
+/// ```
+pub fn apply(base: &[u8], delta: &Patch) -> Result<Vec<u8>, Error> {
+  match delta.diff_algorithm {
+    DiffAlgorithm::Rsync020 => RsyncDiffMachine::apply(base, delta),
+    DiffAlgorithm::Bidiff1 => BidiffDiffMachine::apply(base, delta),
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_diff() {
+    let before = b"hello world";
+    let after = b"hello darkness my old friend";
+
+    let patch_rsync = diff(
+      before,
+      after,
+      DiffAlgorithm::Rsync020,
+      CompressAlgorithm::None,
+    )
+    .expect("failed to diff with rsync");
+
+    let after_rsync =
+      apply(before, &patch_rsync).expect("failed to apply with rsync");
+    assert_eq!(after_rsync, after);
+
+    let patch_bidiff = diff(
+      before,
+      after,
+      DiffAlgorithm::Bidiff1,
+      CompressAlgorithm::Zstd,
+    )
+    .expect("failed to diff with bidiff");
+
+    let after_bidiff = apply(before, &patch_bidiff).expect("failed to apply");
+    assert_eq!(after_bidiff, after);
+  }
+}

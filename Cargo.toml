@@ -1,0 +1,35 @@
+[package]
+name = "darkwing_diff"
+version = "0.1.0"
+authors = ["Ilia Kalitov <ilia@134.team>"]
+edition = "2024"
+
+[lib]
+name = "darkwing_diff"
+path = "lib.rs"
+
+[[bin]]
+name = "compare-diffs"
+path = "bin/compare-diffs.rs"
+
+[dependencies]
+zip = { version = "0.5.13", default-features = false, features = [
+    "deflate",
+    "time",
+] }
+pretty_env_logger = { version = "0.5.0" }
+fast_rsync = "0.2.0"
+rkyv = "0.8.8"
+hex = "0.4.3"
+md5 = "0.7.0"
+bidiff = { version = "1.1.0", git = "https://github.com/divvun/bidiff.git" }
+bipatch = { version = "1.1.0", git = "https://github.com/divvun/bidiff.git" }
+pipe = "0.4.0"
+zstd = "0.13.2"
+log = "0.4.22"
+tabled = "0.16.0" # todo: needed only for binary compare-diffs, mb can move to optional dependency somehow
+
+[dev-dependencies]
+bstr = "*"
+tempfile = { workspace = true }
+pretty_assertions = { workspace = true }
