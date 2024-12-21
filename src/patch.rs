@@ -9,7 +9,7 @@ use crate::{Error, compress::CompressAlgorithm, hash};
 ///
 /// # Example
 /// ```rust
-/// use darkwing_diff::{diff, DiffAlgorithm, CompressAlgorithm};
+/// use files_diff::{diff, DiffAlgorithm, CompressAlgorithm};
 ///
 /// // Use rsync for fast diffing of similar files
 /// let rsync_patch = diff(
@@ -26,7 +26,7 @@ use crate::{Error, compress::CompressAlgorithm, hash};
 ///     DiffAlgorithm::Bidiff1,
 ///     CompressAlgorithm::Zstd
 /// )?;
-/// # Ok::<(), darkwing_diff::Error>(())
+/// # Ok::<(), files_diff::Error>(())
 /// ```
 #[derive(
   Archive,
@@ -63,7 +63,7 @@ impl std::fmt::Display for DiffAlgorithm {
 ///
 /// # Example
 /// ```rust
-/// use darkwing_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
+/// use files_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
 ///
 /// let source = b"original content";
 /// let target = b"modified content";
@@ -77,12 +77,12 @@ impl std::fmt::Display for DiffAlgorithm {
 /// )?;
 ///
 /// // Verify source hash matches
-/// assert_eq!(darkwing_diff::hash(source), patch.before_hash);
+/// assert_eq!(files_diff::hash(source), patch.before_hash);
 ///
 /// // Apply patch and verify result
 /// let result = apply(source, &patch)?;
-/// assert_eq!(darkwing_diff::hash(&result), patch.after_hash);
-/// # Ok::<(), darkwing_diff::Error>(())
+/// assert_eq!(files_diff::hash(&result), patch.after_hash);
+/// # Ok::<(), files_diff::Error>(())
 /// ```
 #[derive(Archive, rkyv::Deserialize, rkyv::Serialize, Debug, PartialEq)]
 #[rkyv(derive(Debug))]
@@ -135,7 +135,7 @@ pub type Filename = String;
 ///
 /// # Example
 /// ```no_run
-/// use darkwing_diff::{diff_zip, DiffAlgorithm, CompressAlgorithm};
+/// use files_diff::{diff_zip, DiffAlgorithm, CompressAlgorithm};
 ///
 /// let patch_set = diff_zip(
 ///     "before.zip".to_string(),
@@ -144,7 +144,7 @@ pub type Filename = String;
 ///     CompressAlgorithm::Zstd
 /// )?;
 ///
-/// # Ok::<(), darkwing_diff::Error>(())
+/// # Ok::<(), files_diff::Error>(())
 /// ```
 #[derive(Archive, rkyv::Deserialize, rkyv::Serialize, Debug, PartialEq)]
 #[rkyv(derive(Debug))]
@@ -196,7 +196,7 @@ impl Operations {
 ///
 /// # Example
 /// ```no_run
-/// use darkwing_diff::{diff_zip, apply_zip, DiffAlgorithm, CompressAlgorithm};
+/// use files_diff::{diff_zip, apply_zip, DiffAlgorithm, CompressAlgorithm};
 ///
 /// // Generate patches for all files in the zip
 /// let patch_set = diff_zip(
@@ -208,7 +208,7 @@ impl Operations {
 ///
 /// // Apply all patches to transform the zip
 /// apply_zip("source.zip", patch_set, "result.zip".to_string())?;
-/// # Ok::<(), darkwing_diff::Error>(())
+/// # Ok::<(), files_diff::Error>(())
 /// ```
 #[derive(Archive, rkyv::Deserialize, rkyv::Serialize, Debug, PartialEq)]
 #[rkyv(derive(Debug))]

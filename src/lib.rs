@@ -12,7 +12,7 @@
 //!
 //! # Basic Usage
 //! ```rust
-//! use darkwing_diff::{diff, apply, DEFAULT_ALGO};
+//! use files_diff::{diff, apply, DEFAULT_ALGO};
 //!
 //! let before = b"hello world";
 //! let after = b"hello darkness my old friend";
@@ -24,12 +24,12 @@
 //! // Apply the patch to recreate the target file
 //! let result = apply(before, &patch)?;
 //! assert_eq!(&result, after);
-//! # Ok::<(), darkwing_diff::Error>(())
+//! # Ok::<(), files_diff::Error>(())
 //! ```
 //!
 //! # Advanced Usage
 //! ```no_run
-//! use darkwing_diff::{diff_zip, apply_zip, DiffAlgorithm, CompressAlgorithm};
+//! use files_diff::{diff_zip, apply_zip, DiffAlgorithm, CompressAlgorithm};
 //!
 //! // For zip archives, use the specialized zip functions
 //! let patch_set = diff_zip(
@@ -41,7 +41,7 @@
 //!
 //! // Apply patches to transform the original zip
 //! apply_zip("before.zip", patch_set, "result.zip".to_string())?;
-//! # Ok::<(), darkwing_diff::Error>(())
+//! # Ok::<(), files_diff::Error>(())
 //! ```
 //!
 //! The library uses [fast-rsync] for the rsync algorithm and [bidiff] for the
@@ -80,7 +80,7 @@ pub const DEFAULT_ALGO: (DiffAlgorithm, CompressAlgorithm) =
 ///
 /// # Example
 /// ```no_run
-/// use darkwing_diff::{DiffMachine, CompressAlgorithm, Error, Patch};
+/// use files_diff::{DiffMachine, CompressAlgorithm, Error, Patch};
 /// struct MyDiffMachine;
 ///
 /// impl DiffMachine for MyDiffMachine {
@@ -114,7 +114,7 @@ pub trait DiffMachine {
 ///
 /// # Example
 /// ```rust
-/// use darkwing_diff::hash;
+/// use files_diff::hash;
 ///
 /// let data = b"Hello, world!";
 /// let hash_str = hash(data);
@@ -132,7 +132,7 @@ pub fn hash(data: &[u8]) -> String {
 ///
 /// # Example
 /// ```rust
-/// use darkwing_diff::{diff, DiffAlgorithm, CompressAlgorithm};
+/// use files_diff::{diff, DiffAlgorithm, CompressAlgorithm};
 ///
 /// let before = b"original data";
 /// let after = b"modified data";
@@ -143,7 +143,7 @@ pub fn hash(data: &[u8]) -> String {
 ///     DiffAlgorithm::Rsync020,
 ///     CompressAlgorithm::Zstd
 /// )?;
-/// # Ok::<(), darkwing_diff::Error>(())
+/// # Ok::<(), files_diff::Error>(())
 /// ```
 pub fn diff(
   before: &[u8],
@@ -168,7 +168,7 @@ pub fn diff(
 ///
 /// # Example
 /// ```rust
-/// use darkwing_diff::{diff, apply, DEFAULT_ALGO};
+/// use files_diff::{diff, apply, DEFAULT_ALGO};
 ///
 /// let base = b"original data";
 /// let target = b"modified data";
@@ -178,7 +178,7 @@ pub fn diff(
 /// let result = apply(base, &patch)?;
 ///
 /// assert_eq!(result, target);
-/// # Ok::<(), darkwing_diff::Error>(())
+/// # Ok::<(), files_diff::Error>(())
 /// ```
 pub fn apply(base: &[u8], delta: &Patch) -> Result<Vec<u8>, Error> {
   match delta.diff_algorithm {

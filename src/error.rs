@@ -6,7 +6,7 @@
 ///
 /// # Example
 /// ```rust
-/// use darkwing_diff::{diff, DiffAlgorithm, CompressAlgorithm};
+/// use files_diff::{diff, DiffAlgorithm, CompressAlgorithm};
 ///
 /// let before = b"original";
 /// let after = b"modified";
@@ -14,8 +14,8 @@
 /// match diff(before, after, DiffAlgorithm::Rsync020, CompressAlgorithm::Zstd) {
 ///     Ok(patch) => println!("Patch generated successfully"),
 ///     Err(e) => match e {
-///         darkwing_diff::Error::IoError(msg) => eprintln!("IO error: {}", msg),
-///         darkwing_diff::Error::BeforeHashMismatch => eprintln!("Source file corrupted"),
+///         files_diff::Error::IoError(msg) => eprintln!("IO error: {}", msg),
+///         files_diff::Error::BeforeHashMismatch => eprintln!("Source file corrupted"),
 ///         _ => eprintln!("Other error: {:?}", e),
 ///     }
 /// }

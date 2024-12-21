@@ -1,4 +1,4 @@
-# darkwing_diff
+# files-diff
 
 A high-performance binary diffing library for files and ZIP archives with a focus on stability, extensive testing, and a convenient developer interface.
 
@@ -13,7 +13,7 @@ A high-performance binary diffing library for files and ZIP archives with a focu
 
 ### Developer-Friendly Interface
 
-Unlike other low-level diffing libraries, darkwing_diff provides an intuitive API that simplifies common operations while maintaining high performance:
+Unlike other low-level diffing libraries, files_diff provides an intuitive API that simplifies common operations while maintaining high performance:
 
 ```rust
 // Simple one-line diffing
@@ -48,7 +48,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-darkwing_diff = "0.1.0"
+files_diff = "0.1.0"
 ```
 
 ## Basic usage
@@ -56,7 +56,7 @@ darkwing_diff = "0.1.0"
 ### Diffing and Patching Files
 
 ```rust
-use darkwing_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
+use files_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
 
 // Generate a patch
 let before = b"original content";
@@ -78,7 +78,7 @@ assert_eq!(&result, after);
 ### Working with ZIP Archives
 
 ```rust
-use darkwing_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
+use files_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
 
 // Generate a patch set for all files in the ZIP archive
 let patch_set = diff_zip(
@@ -129,7 +129,7 @@ let result = apply_zip(
 All patches include MD5 hashes for validation:
 
 ```rust
-use darkwing_diff::hash;
+use files_diff::hash;
 
 let patch = diff(before, after, diff_algo, compress_algo)?;
 

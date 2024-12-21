@@ -1,12 +1,12 @@
 [package]
-name = "darkwing_diff"
+name = "files-diff"
 version = "0.1.0"
 authors = ["Ilia Kalitov <ilia@134.team>"]
 edition = "2024"
 
 [lib]
-name = "darkwing_diff"
-path = "lib.rs"
+name = "files_diff"
+path = "src/lib.rs"
 
 [[bin]]
 name = "compare-diffs"
@@ -31,5 +31,5 @@ tabled = "0.16.0" # todo: needed only for binary compare-diffs, mb can move to o
 
 [dev-dependencies]
 bstr = "*"
-tempfile = { workspace = true }
-pretty_assertions = { workspace = true }
+tempfile = "3.8.1"
+pretty_assertions = "*"

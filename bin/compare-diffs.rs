@@ -1,4 +1,4 @@
-use darkwing_diff::{
+use files_diff::{
   CompressAlgorithm, DiffAlgorithm, Patch, PatchSet, apply, apply_zip, diff,
   diff_zip,
 };
