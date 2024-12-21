@@ -3,6 +3,11 @@ name = "files-diff"
 version = "0.1.0"
 authors = ["Ilia Kalitov <ilia@134.team>"]
 edition = "2024"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/dolphin-foss/files-diff"
+homepage = "https://github.com/dolphin-foss/files-diff"
+description = "A library for diffing files and ZIP archives."
+readme = "README.md"
 
 [lib]
 name = "files_diff"
