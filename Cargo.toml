@@ -3,7 +3,7 @@ name = "files-diff"
 version = "0.1.0"
 authors = ["Ilia Kalitov <ilia@134.team>"]
 edition = "2024"
-license = "GPL-3.0-or-later"
+license = "BSD-2-Clause"
 repository = "https://github.com/dolphin-foss/files-diff"
 homepage = "https://github.com/dolphin-foss/files-diff"
 description = "A library for diffing files and ZIP archives."
@@ -27,8 +27,8 @@ fast_rsync = "0.2.0"
 rkyv = "0.8.8"
 hex = "0.4.3"
 md5 = "0.7.0"
-bidiff = { version = "1.1.0", git = "https://github.com/divvun/bidiff.git" }
-bipatch = { version = "1.1.0", git = "https://github.com/divvun/bidiff.git" }
+bidiff = { version = "1.0.0", git = "https://github.com/divvun/bidiff.git" }
+bipatch = { version = "1.0.0", git = "https://github.com/divvun/bidiff.git" }
 pipe = "0.4.0"
 zstd = "0.13.2"
 log = "0.4.22"
