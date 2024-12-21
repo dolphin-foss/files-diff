@@ -6,7 +6,7 @@ edition = "2024"
 license = "BSD-2-Clause"
 repository = "https://github.com/dolphin-foss/files-diff"
 homepage = "https://github.com/dolphin-foss/files-diff"
-description = "A library for diffing files and ZIP archives."
+description = "A library for differing files and ZIP archives."
 readme = "README.md"
 
 [lib]
@@ -35,6 +35,6 @@ log = "0.4.22"
 tabled = "0.16.0" # todo: needed only for binary compare-diffs, mb can move to optional dependency somehow
 
 [dev-dependencies]
-bstr = "*"
+bstr = "1.11.1"
 tempfile = "3.8.1"
-pretty_assertions = "*"
+pretty_assertions = "1.4.1"

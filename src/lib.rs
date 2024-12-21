@@ -5,8 +5,8 @@
 //! A library for generating and applying binary diffs between files and
 //! archives.
 //!
-//! This library provides efficient diffing algorithms to generate patches
-//! between binary files or zip archives. It supports multiple diffing
+//! This library provides efficient differing algorithms to generate patches
+//! between binary files or zip archives. It supports multiple differing
 //! algorithms (rsync and bidiff) and compression methods to optimize patch
 //! sizes.
 //!
@@ -71,12 +71,12 @@ pub use zip::{apply_zip, diff_zip};
 
 /// The default diff and compression algorithm.
 pub const DEFAULT_ALGO: (DiffAlgorithm, CompressAlgorithm) =
-  (DiffAlgorithm::Rsync020, CompressAlgorithm::None);
+    (DiffAlgorithm::Rsync020, CompressAlgorithm::None);
 
-/// A trait that implements diffing and patching operations.
+/// A trait that implements differing and patching operations.
 ///
 /// This trait defines the core operations needed to generate and apply patches
-/// between binary data. Implementations provide specific diffing algorithms.
+/// between binary data. Implementations provide specific differing algorithms.
 ///
 /// # Example
 /// ```no_run
@@ -96,15 +96,15 @@ pub const DEFAULT_ALGO: (DiffAlgorithm, CompressAlgorithm) =
 /// }
 /// ```
 pub trait DiffMachine {
-  /// Diff two byte slices using the given compression algorithm.
-  fn diff(
-    before: &[u8],
-    after: &[u8],
-    compress_algorithm: CompressAlgorithm,
-  ) -> Result<Patch, Error>;
+    /// Diff two byte slices using the given compression algorithm.
+    fn diff(
+        before: &[u8],
+        after: &[u8],
+        compress_algorithm: CompressAlgorithm,
+    ) -> Result<Patch, Error>;
 
-  /// Apply a patch to a byte slice.
-  fn apply(base: &[u8], delta: &Patch) -> Result<Vec<u8>, Error>;
+    /// Apply a patch to a byte slice.
+    fn apply(base: &[u8], delta: &Patch) -> Result<Vec<u8>, Error>;
 }
 
 /// Generates an MD5 hash of the provided data as a hexadecimal string.
@@ -121,14 +121,14 @@ pub trait DiffMachine {
 /// assert_eq!(hash_str.len(), 32); // MD5 hash is always 32 hex chars
 /// ```
 pub fn hash(data: &[u8]) -> String {
-  let hash = md5::compute(data);
-  hex::encode(hash.0)
+    let hash = md5::compute(data);
+    hex::encode(hash.0)
 }
 
 /// Generates a patch between two byte slices using specified algorithms.
 ///
 /// Creates a patch that can transform the `before` data into the `after` data,
-/// using the specified diffing and compression algorithms.
+/// using the specified diff and compression algorithms.
 ///
 /// # Example
 /// ```rust
@@ -146,19 +146,15 @@ pub fn hash(data: &[u8]) -> String {
 /// # Ok::<(), files_diff::Error>(())
 /// ```
 pub fn diff(
-  before: &[u8],
-  after: &[u8],
-  diff_algorithm: DiffAlgorithm,
-  compress_algorithm: CompressAlgorithm,
+    before: &[u8],
+    after: &[u8],
+    diff_algorithm: DiffAlgorithm,
+    compress_algorithm: CompressAlgorithm,
 ) -> Result<Patch, Error> {
-  match diff_algorithm {
-    DiffAlgorithm::Rsync020 => {
-      RsyncDiffMachine::diff(before, after, compress_algorithm)
+    match diff_algorithm {
+        DiffAlgorithm::Rsync020 => RsyncDiffMachine::diff(before, after, compress_algorithm),
+        DiffAlgorithm::Bidiff1 => BidiffDiffMachine::diff(before, after, compress_algorithm),
     }
-    DiffAlgorithm::Bidiff1 => {
-      BidiffDiffMachine::diff(before, after, compress_algorithm)
-    }
-  }
 }
 
 /// Applies a patch to transform the base data.
@@ -181,42 +177,41 @@ pub fn diff(
 /// # Ok::<(), files_diff::Error>(())
 /// ```
 pub fn apply(base: &[u8], delta: &Patch) -> Result<Vec<u8>, Error> {
-  match delta.diff_algorithm {
-    DiffAlgorithm::Rsync020 => RsyncDiffMachine::apply(base, delta),
-    DiffAlgorithm::Bidiff1 => BidiffDiffMachine::apply(base, delta),
-  }
+    match delta.diff_algorithm {
+        DiffAlgorithm::Rsync020 => RsyncDiffMachine::apply(base, delta),
+        DiffAlgorithm::Bidiff1 => BidiffDiffMachine::apply(base, delta),
+    }
 }
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn test_diff() {
-    let before = b"hello world";
-    let after = b"hello darkness my old friend";
+    #[test]
+    fn test_diff() {
+        let before = b"hello world";
+        let after = b"hello darkness my old friend";
 
-    let patch_rsync = diff(
-      before,
-      after,
-      DiffAlgorithm::Rsync020,
-      CompressAlgorithm::None,
-    )
-    .expect("failed to diff with rsync");
+        let patch_rsync = diff(
+            before,
+            after,
+            DiffAlgorithm::Rsync020,
+            CompressAlgorithm::None,
+        )
+        .expect("failed to diff with rsync");
 
-    let after_rsync =
-      apply(before, &patch_rsync).expect("failed to apply with rsync");
-    assert_eq!(after_rsync, after);
+        let after_rsync = apply(before, &patch_rsync).expect("failed to apply with rsync");
+        assert_eq!(after_rsync, after);
 
-    let patch_bidiff = diff(
-      before,
-      after,
-      DiffAlgorithm::Bidiff1,
-      CompressAlgorithm::Zstd,
-    )
-    .expect("failed to diff with bidiff");
+        let patch_bidiff = diff(
+            before,
+            after,
+            DiffAlgorithm::Bidiff1,
+            CompressAlgorithm::Zstd,
+        )
+        .expect("failed to diff with bidiff");
 
-    let after_bidiff = apply(before, &patch_bidiff).expect("failed to apply");
-    assert_eq!(after_bidiff, after);
-  }
+        let after_bidiff = apply(before, &patch_bidiff).expect("failed to apply");
+        assert_eq!(after_bidiff, after);
+    }
 }

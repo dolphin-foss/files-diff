@@ -1,22 +1,22 @@
 # files-diff
 
-A high-performance binary diffing library for files and ZIP archives with a focus on stability, extensive testing, and a convenient developer interface.
+A high-performance binary differing library for files and ZIP archives with a focus on stability, extensive testing, and a convenient developer interface.
 
 ## Key Features
 
 ### ZIP Archive Handling
 
-- Custom PatchSet abstraction for efficient ZIP archive diffing
+- Custom PatchSet abstraction for efficient ZIP archive differing
 - Intelligent handling of file additions, deletions, and modifications
 - Preserves directory structure while only patching changed files
 - Built-in serialization support for patch storage and transmission
 
 ### Developer-Friendly Interface
 
-Unlike other low-level diffing libraries, files_diff provides an intuitive API that simplifies common operations while maintaining high performance:
+Unlike other low-level `diff` libraries, files_diff provides an intuitive API that simplifies common operations while maintaining high performance:
 
 ```rust
-// Simple one-line diffing
+// Simple one-line diff
 let patch = diff(before, after, DiffAlgorithm::Rsync020, CompressAlgorithm::Zstd)?;
 
 // Straightforward ZIP archive handling
@@ -32,7 +32,7 @@ let patch_set = diff_zip("before.zip", "after.zip", diff_algo, compress_algo)?;
 
 ## Supported Features
 
-- Multiple diffing algorithms
+- Multiple differing algorithms
 
   - Rsync020: Optimized for files that are mostly similar (based on fast-rsync)
   - Bidiff1: Better for files with significant differences (based on bidiff)
@@ -53,7 +53,7 @@ files_diff = "0.1.0"
 
 ## Basic usage
 
-### Diffing and Patching Files
+### differing and Patching Files
 
 ```rust
 use files_diff::{diff, apply, DiffAlgorithm, CompressAlgorithm};
